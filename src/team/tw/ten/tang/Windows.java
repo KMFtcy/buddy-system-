@@ -107,7 +107,6 @@ public class Windows extends Observable implements Observer {
 		firstBlock.setBackground(new Color(255, 156, 156));
 		firstBlock.setLayout(new BorderLayout());
 		JLabel BlockInfo = new JLabel("≥ı ºªØ", JLabel.CENTER);
-		BlockInfo.setFont(new Font("Œ¢»Ì—≈∫⁄", Font.BOLD, 40));
 		firstBlock.add(BlockInfo, BorderLayout.CENTER);
 		memoryPanel.add(firstBlock);
 	}

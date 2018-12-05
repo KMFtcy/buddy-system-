@@ -16,8 +16,9 @@ public class Window extends Observable implements Observer {
 	JPanel centerBottomArea;// 底部容器
 	int[] freeAreaNum;
 	JLabel[] freeAreaNumLabel;//显示空闲内存块数量的标签
+	JLabel[] UsedAreaNumLabel;//显示空闲内存块数量的标签
 	int UsedAreaNum;
-	JLabel UsedAreaNumLabel;//显示使用中内存块数量的标签
+	//弃用 JLabel UsedAreaNumLabel;//显示使用中内存块数量的标签
 	JComboBox<Integer> memorySizeComboBox;// 选择内存大小
 	JComboBox<Integer> pageSizeComboBox;// 选择页大小
 	JPanel memoryPanel;
@@ -40,22 +41,27 @@ public class Window extends Observable implements Observer {
 		centerBottomArea = new JPanel();
 
 		container.setLayout(new BorderLayout());
-		leftArea.setLayout(new GridLayout(14, 2, 20, 20));
+		leftArea.setLayout(new GridLayout(14, 3, 20, 20));
 		centerArea.setLayout(new BorderLayout());
 		centerCenterArea.setLayout(new GridLayout(1, 5,10,20));
-
+		
+		leftArea.add(new JLabel("  组号"));
+		leftArea.add(new JLabel("空闲"));
+		leftArea.add(new JLabel("使用中"));
 		for (int i = 0; i < freeAreaNum.length; i++) {
-			leftArea.add(new JLabel("  第" + (i + 1) + "组空闲内存块数量："));
+			leftArea.add(new JLabel("  第" + (i + 1) + "组："));
 			leftArea.add(freeAreaNumLabel[i]);
+			leftArea.add(UsedAreaNumLabel[i]);
 		}
-		leftArea.add(new JLabel("  使用中存块数量："));
-		leftArea.add(UsedAreaNumLabel);
 		leftArea.add(new JLabel("  内存大小"));
 		leftArea.add(memorySizeComboBox);
+		leftArea.add(new JLabel("kb"));
 		leftArea.add(new JLabel("  页面大小"));
 		leftArea.add(pageSizeComboBox);
+		leftArea.add(new JLabel("kb"));
 		leftArea.add(refreshButton);
 		leftArea.add(resetButton);
+		leftArea.add(new JLabel("  "));
 		centerCenterArea.add(new JLabel("要对",null,JLabel.RIGHT));
 		centerCenterArea.add(operateBlockNumTextField);
 		centerCenterArea.add(new JLabel("个内存块进行："));
@@ -131,8 +137,10 @@ public class Window extends Observable implements Observer {
 			freeAreaNum[i] = -1;
 			freeAreaNumLabel[i] = new JLabel(freeAreaNum[i] + "块");
 		}
-		UsedAreaNum = -1;
-		UsedAreaNumLabel = new JLabel(UsedAreaNum + "块");
+		UsedAreaNumLabel = new JLabel[Constant.ORDER];
+		for (int i = 0; i < UsedAreaNumLabel.length; i++) {
+			UsedAreaNumLabel[i] = new JLabel(0 + "块");
+		}
 		//初始化监视器的TextArea
 		console = new JTextArea(15,36);
 		console.setEditable(false);
@@ -228,11 +236,11 @@ public class Window extends Observable implements Observer {
 		UsedAreaNum = usedAreaNum;
 	}
 
-	public JLabel getUsedAreaNumLabel() {
+	public JLabel[] getUsedAreaNumLabel() {
 		return UsedAreaNumLabel;
 	}
 
-	public void setUsedAreaNumLabel(JLabel usedAreaNumLabel) {
+	public void setUsedAreaNumLabel(JLabel[] usedAreaNumLabel) {
 		UsedAreaNumLabel = usedAreaNumLabel;
 	}
 

@@ -2,6 +2,7 @@ package team.tw.newten.tang.command;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.util.ArrayList;
 
 import javax.swing.JLabel;
@@ -33,19 +34,26 @@ public class RefreshWindowCommand implements Command {
 		//这个函数的思路，是读出cpu中已使用内存块、空闲内存块的数量信息，在窗口将他们更新，同时组合二者的地址信息在窗口画出内存状态图
 		Free_area_head memoryBlockList = new Free_area_head(0);//这是整个内存条的内存块信息
 		//首先将已使用内存块的信息读出，填入总内存块信息的数组
-		for (Block block : cpu.getRecentUsedBlock()) {
-			memoryBlockList.addBlock(block);
+		int[] usedBlockNumList = new int[Constant.ORDER];
+		for (int i : usedBlockNumList) {
+			i = 0;
 		}
-		//在这之后，更新一下窗口中已使用内存块的信息
-		int usedAreaNum = cpu.getRecentUsedBlock().size();
-		window.getUsedAreaNumLabel().setText(usedAreaNum + " 块");
+		int x = 0;
+		for (Block block : cpu.getRecentUsedBlock()) {
+			//每次读出的时候，顺便更新一下使用块的信息
+			int order = calOrder(block.getSize());
+			usedBlockNumList[order] ++; 
+			memoryBlockList.addBlock(block);
+			x++;
+		}
 		//接着将空闲内存块的信息读出，填入总内存块信息的数组
 		ArrayList<Free_area_head> Free_area_list = cpu.getFree_area_list();
 		JLabel[] freeAreaNumLabel = window.getFreeAreaNumLabel();
+		JLabel[] usedAreaNumLabel = window.getUsedAreaNumLabel();
 		for (int i = 0; i < Constant.ORDER; i++) {
-			//在遍历的同时，顺便更新一下窗口空闲内存块的信息，减少一次遍历
-			int size = (int) Math.pow(2, Free_area_list.get(i).order);
-			freeAreaNumLabel[i].setText(Free_area_list.get(i).getNum() + " 块" + "(大小为" + size + "页)");
+			//在遍历的同时，顺便更新一下窗口空闲和占用内存块的信息，减少一次遍历
+			freeAreaNumLabel[i].setText(Free_area_list.get(i).getNum() + " 块");
+			usedAreaNumLabel[i].setText(usedBlockNumList[i] + " 块");
 			for (Block block : Free_area_list.get(i).getBlockList()) {
 				memoryBlockList.addBlock(block);
 			}
@@ -66,11 +74,15 @@ public class RefreshWindowCommand implements Command {
 		//绘制内存条
 		window.getMemoryPanel().removeAll();
 		for (Block block : memoryBlockList.getBlockList()) {
-			int size = block.getSize();
+			int blockSize = block.getSize();
 			JPanel newBlockPanel = new JPanel();
-			newBlockPanel.setPreferredSize(new Dimension((int)size/10,120));
-			newBlockPanel.setBackground(getColor(block.isUsed()));
-			newBlockPanel.add(new JLabel(String.valueOf(block.getAddress())));
+			newBlockPanel.setPreferredSize(new Dimension(80-(int)(1000/blockSize),120));
+			newBlockPanel.setBackground(getColor(block.isUsed()?blockSize:-1));
+			newBlockPanel.setLayout(new GridLayout(5, 1));
+			JLabel sizeInfo = new JLabel(String.valueOf(blockSize));
+			JLabel adressInfo = new JLabel(String.valueOf(block.getAddress()));
+			newBlockPanel.add(sizeInfo);
+			newBlockPanel.add(adressInfo);
 			window.getMemoryPanel().add(newBlockPanel);
 		}
 		//更新窗口的左栏
@@ -79,12 +91,20 @@ public class RefreshWindowCommand implements Command {
 		//在窗口监视器提醒
 		window.printlnConsole("刷新成功！");
 	}
-	private Color getColor(boolean isUsed) {
-		if(isUsed) {
-			return new Color(62, 237, 231);
-		}else {
-			return new Color(255,255,224);
+	private Color getColor(int size) {
+		switch (size) {
+		case -1:
+			return new Color(161, 175, 201);
+		default:
+			return new Color(51, 153, 204);
 		}
+	}
+	private int calOrder(int size) {
+		int order = 0;
+		while (Math.pow(2, (int) order) < size) {
+			order++;
+		}
+		return order;
 	}
 	@Override
 	public void execute(Window window) {
