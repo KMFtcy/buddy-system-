@@ -10,4 +10,6 @@ public final class Constant {
 	public static int PAGE_SIZE = PAGE_SIZE_OPTION[0];
 	public final static int ORDER = 10;//代表有几组内存块
 	
+	public static boolean isSingleStep = false;
+	public static boolean canContinue = true;
 }
