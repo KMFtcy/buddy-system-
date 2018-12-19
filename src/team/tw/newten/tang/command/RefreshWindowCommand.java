@@ -81,7 +81,9 @@ public class RefreshWindowCommand implements Command {
 			newBlockPanel.setLayout(new GridLayout(5, 1));
 			JLabel sizeInfo = new JLabel(String.valueOf(blockSize));
 			JLabel adressInfo = new JLabel(String.valueOf(block.getAddress()));
+			newBlockPanel.add(new JLabel("¥Û–°:"));
 			newBlockPanel.add(sizeInfo);
+			newBlockPanel.add(new JLabel("µÿ÷∑:"));
 			newBlockPanel.add(adressInfo);
 			window.getMemoryPanel().add(newBlockPanel);
 		}
